@@ -220,8 +220,8 @@ local highlights = {}
 local function addHighlight(char)
 	if highlights[char] then return end
 	local highlight = Instance.new("Highlight")
-	highlight.FillColor = Color3.fromRGB(0, 255, 0)
-	highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+	highlight.FillColor = Color3.fromRGB(235, 235, 235)
+	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
 	highlight.Parent = char
 	highlights[char] = highlight
 end
