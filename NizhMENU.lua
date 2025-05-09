@@ -1,4 +1,9 @@
+-- NizhMENU (Visuals: ESP+Light, Player: все функции, Combat: AimLock)
 local player = game.Players.LocalPlayer
+local players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
 local playerGui = player:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "NizhMENU"
@@ -37,21 +42,6 @@ titleText.TextSize = 22
 titleText.Font = Enum.Font.GothamBold
 titleText.TextXAlignment = Enum.TextXAlignment.Left
 titleText.Parent = titleBar
-
-local themeToggleButton = Instance.new("TextButton")
-themeToggleButton.Name = "ThemeToggleButton"
-themeToggleButton.Size = UDim2.new(0, 110, 0, 32)
-themeToggleButton.Position = UDim2.new(1, -120, 0, 4)
-themeToggleButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
-themeToggleButton.Text = "Light Theme"
-themeToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-themeToggleButton.Font = Enum.Font.Gotham
-themeToggleButton.TextSize = 15
-themeToggleButton.Parent = titleBar
-
-local themeToggleCorner = Instance.new("UICorner")
-themeToggleCorner.CornerRadius = UDim.new(0, 10)
-themeToggleCorner.Parent = themeToggleButton
 
 local tabButtonsFrame = Instance.new("Frame")
 tabButtonsFrame.Name = "TabButtons"
@@ -94,6 +84,21 @@ local playerTabCorner = Instance.new("UICorner")
 playerTabCorner.CornerRadius = UDim.new(0, 10)
 playerTabCorner.Parent = playerTabButton
 
+local combatTabButton = Instance.new("TextButton")
+combatTabButton.Name = "CombatTab"
+combatTabButton.Size = UDim2.new(1, -16, 0, 40)
+combatTabButton.Position = UDim2.new(0, 8, 0, 104)
+combatTabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
+combatTabButton.Text = "Combat"
+combatTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+combatTabButton.Font = Enum.Font.Gotham
+combatTabButton.TextSize = 18
+combatTabButton.Parent = tabButtonsFrame
+
+local combatTabCorner = Instance.new("UICorner")
+combatTabCorner.CornerRadius = UDim.new(0, 10)
+combatTabCorner.Parent = combatTabButton
+
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
 contentFrame.Size = UDim2.new(1, -120, 1, -48)
@@ -119,13 +124,27 @@ visualsContent.BackgroundTransparency = 1
 visualsContent.Visible = false
 visualsContent.Parent = contentFrame
 
+local combatContent = Instance.new("Frame")
+combatContent.Name = "CombatContent"
+combatContent.Size = UDim2.new(1, 0, 1, 0)
+combatContent.BackgroundTransparency = 1
+combatContent.Visible = false
+combatContent.Parent = contentFrame
+
 visualsTabButton.MouseButton1Click:Connect(function()
 	visualsContent.Visible = true
 	playerContent.Visible = false
+	combatContent.Visible = false
 end)
 playerTabButton.MouseButton1Click:Connect(function()
 	visualsContent.Visible = false
 	playerContent.Visible = true
+	combatContent.Visible = false
+end)
+combatTabButton.MouseButton1Click:Connect(function()
+	visualsContent.Visible = false
+	playerContent.Visible = false
+	combatContent.Visible = true
 end)
 
 local dragging, dragInput, dragStart, startPos
@@ -146,7 +165,7 @@ titleBar.InputChanged:Connect(function(input)
 		dragInput = input
 	end
 end)
-game:GetService("UserInputService").InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
 		menuFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -156,6 +175,154 @@ end)
 local functionFrameHeight = 54
 local functionFrameSpacing = 10
 
+-- ================= VISUALS TAB =================
+
+-- ESP (Highlight) Toggle
+local espFrame = Instance.new("Frame")
+espFrame.Name = "ESPFrame"
+espFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+espFrame.Position = UDim2.new(0.025, 0, 0.05, 0)
+espFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+espFrame.Parent = visualsContent
+
+local espCorner = Instance.new("UICorner")
+espCorner.CornerRadius = UDim.new(0, 8)
+espCorner.Parent = espFrame
+
+local espLabel = Instance.new("TextLabel")
+espLabel.Name = "ESPLabel"
+espLabel.Size = UDim2.new(0.6, 0, 1, 0)
+espLabel.Position = UDim2.new(0, 10, 0, 0)
+espLabel.BackgroundTransparency = 1
+espLabel.Text = "ESP (Highlight)"
+espLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+espLabel.TextSize = 18
+espLabel.Font = Enum.Font.GothamBold
+espLabel.TextXAlignment = Enum.TextXAlignment.Left
+espLabel.Parent = espFrame
+
+local espToggleButton = Instance.new("TextButton")
+espToggleButton.Name = "ESPToggleButton"
+espToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+espToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+espToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+espToggleButton.Text = "Enable"
+espToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+espToggleButton.TextSize = 15
+espToggleButton.Font = Enum.Font.Gotham
+espToggleButton.Parent = espFrame
+
+local espToggleCorner = Instance.new("UICorner")
+espToggleCorner.CornerRadius = UDim.new(0, 6)
+espToggleCorner.Parent = espToggleButton
+
+local highlights = {}
+local function addHighlight(char)
+	if highlights[char] then return end
+	local highlight = Instance.new("Highlight")
+	highlight.FillColor = Color3.fromRGB(0, 255, 0)
+	highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+	highlight.Parent = char
+	highlights[char] = highlight
+end
+local function removeHighlight(char)
+	if highlights[char] then
+		highlights[char]:Destroy()
+		highlights[char] = nil
+	end
+end
+
+local espEnabled = false
+espToggleButton.MouseButton1Click:Connect(function()
+	espEnabled = not espEnabled
+	espToggleButton.Text = espEnabled and "Disable" or "Enable"
+	espToggleButton.BackgroundColor3 = espEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if espEnabled then
+		for _, plr in pairs(players:GetPlayers()) do
+			if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+				addHighlight(plr.Character)
+			end
+		end
+	else
+		for char, _ in pairs(highlights) do
+			removeHighlight(char)
+		end
+	end
+end)
+players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function(char)
+		if espEnabled then
+			addHighlight(char)
+		end
+	end)
+end)
+players.PlayerRemoving:Connect(function(plr)
+	if plr.Character then
+		removeHighlight(plr.Character)
+	end
+end)
+
+-- Light Frame
+local lightFrame = Instance.new("Frame")
+lightFrame.Name = "LightFrame"
+lightFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+lightFrame.Position = UDim2.new(0.025, 0, 0, espFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+lightFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+lightFrame.Parent = visualsContent
+
+local lightCorner = Instance.new("UICorner")
+lightCorner.CornerRadius = UDim.new(0, 8)
+lightCorner.Parent = lightFrame
+
+local lightLabel = Instance.new("TextLabel")
+lightLabel.Name = "LightLabel"
+lightLabel.Size = UDim2.new(0.6, 0, 1, 0)
+lightLabel.Position = UDim2.new(0, 10, 0, 0)
+lightLabel.BackgroundTransparency = 1
+lightLabel.Text = "FullBright"
+lightLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+lightLabel.TextSize = 18
+lightLabel.Font = Enum.Font.GothamBold
+lightLabel.TextXAlignment = Enum.TextXAlignment.Left
+lightLabel.Parent = lightFrame
+
+local lightToggleButton = Instance.new("TextButton")
+lightToggleButton.Name = "LightToggleButton"
+lightToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+lightToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+lightToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+lightToggleButton.Text = "Enable"
+lightToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+lightToggleButton.TextSize = 15
+lightToggleButton.Font = Enum.Font.Gotham
+lightToggleButton.Parent = lightFrame
+
+local lightToggleCorner = Instance.new("UICorner")
+lightToggleCorner.CornerRadius = UDim.new(0, 6)
+lightToggleCorner.Parent = lightToggleButton
+
+local oldAmbient, oldBrightness
+local lightEnabled = false
+lightToggleButton.MouseButton1Click:Connect(function()
+	lightEnabled = not lightEnabled
+	lightToggleButton.Text = lightEnabled and "Disable" or "Enable"
+	lightToggleButton.BackgroundColor3 = lightEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if lightEnabled then
+		local lighting = game:GetService("Lighting")
+		oldAmbient = lighting.Ambient
+		oldBrightness = lighting.Brightness
+		lighting.Ambient = Color3.new(1,1,1)
+		lighting.Brightness = 5
+	else
+		local lighting = game:GetService("Lighting")
+		if oldAmbient then lighting.Ambient = oldAmbient end
+		if oldBrightness then lighting.Brightness = oldBrightness end
+	end
+end)
+
+-- ================= PLAYER TAB =================
+
+-- WalkSpeed Frame
 local walkSpeedFrame = Instance.new("Frame")
 walkSpeedFrame.Name = "WalkSpeedFrame"
 walkSpeedFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
@@ -208,6 +375,18 @@ local walkSpeedButtonCorner = Instance.new("UICorner")
 walkSpeedButtonCorner.CornerRadius = UDim.new(0, 6)
 walkSpeedButtonCorner.Parent = walkSpeedButton
 
+walkSpeedButton.MouseButton1Click:Connect(function()
+	local speed = tonumber(walkSpeedSlider.Text)
+	if speed and speed > 0 then
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.WalkSpeed = speed
+			walkSpeedLabel.Text = "Walk Speed: "..speed
+		end
+	end
+end)
+
+-- JumpPower Frame
 local jumpPowerFrame = Instance.new("Frame")
 jumpPowerFrame.Name = "JumpPowerFrame"
 jumpPowerFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
@@ -260,6 +439,18 @@ local jumpPowerButtonCorner = Instance.new("UICorner")
 jumpPowerButtonCorner.CornerRadius = UDim.new(0, 6)
 jumpPowerButtonCorner.Parent = jumpPowerButton
 
+jumpPowerButton.MouseButton1Click:Connect(function()
+	local power = tonumber(jumpPowerSlider.Text)
+	if power and power > 0 then
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.JumpPower = power
+			jumpPowerLabel.Text = "Jump Power: "..power
+		end
+	end
+end)
+
+-- Spin Frame
 local spinFrame = Instance.new("Frame")
 spinFrame.Name = "SpinFrame"
 spinFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
@@ -332,7 +523,7 @@ spinToggle.MouseButton1Click:Connect(function()
 		spinSpeed = tonumber(spinSpeedBox.Text) or 0
 		if spinSpeed == 0 then spinSpeed = 10 end
 		if spinConnection then spinConnection:Disconnect() end
-		spinConnection = game:GetService("RunService").RenderStepped:Connect(function(dt)
+		spinConnection = RunService.RenderStepped:Connect(function(dt)
 			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
 				player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0)
 			end
@@ -349,6 +540,7 @@ spinSpeedBox.FocusLost:Connect(function(enter)
 	end
 end)
 
+-- Infinite Jump Frame
 local infiniteJumpFrame = Instance.new("Frame")
 infiniteJumpFrame.Name = "InfiniteJumpFrame"
 infiniteJumpFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
@@ -384,15 +576,17 @@ infiniteJumpToggleButton.Font = Enum.Font.Gotham
 infiniteJumpToggleButton.Parent = infiniteJumpFrame
 
 local infiniteJumpToggleCorner = Instance.new("UICorner")
-infiniteJumpToggleCorner.CornerRadius = UDim.new(0, 8)
+infiniteJumpToggleCorner.CornerRadius = UDim.new(0, 6)
 infiniteJumpToggleCorner.Parent = infiniteJumpToggleButton
 
 local infiniteJumpEnabled = false
-local UserInputService = game:GetService("UserInputService")
+
 infiniteJumpToggleButton.MouseButton1Click:Connect(function()
 	infiniteJumpEnabled = not infiniteJumpEnabled
 	infiniteJumpToggleButton.Text = infiniteJumpEnabled and "Disable" or "Enable"
+	infiniteJumpToggleButton.BackgroundColor3 = infiniteJumpEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
 end)
+
 UserInputService.JumpRequest:Connect(function()
 	if infiniteJumpEnabled then
 		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
@@ -402,226 +596,100 @@ UserInputService.JumpRequest:Connect(function()
 	end
 end)
 
-local espFrame = Instance.new("Frame")
-espFrame.Name = "ESPFrame"
-espFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
-espFrame.Position = UDim2.new(0.025, 0, 0.05, 0)
-espFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-espFrame.Parent = visualsContent
+-- ================= COMBAT TAB =================
 
-local espCorner = Instance.new("UICorner")
-espCorner.CornerRadius = UDim.new(0, 8)
-espCorner.Parent = espFrame
+-- AimLock Frame
+local aimLockFrame = Instance.new("Frame")
+aimLockFrame.Name = "AimLockFrame"
+aimLockFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+aimLockFrame.Position = UDim2.new(0.025, 0, 0.05, 0)
+aimLockFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+aimLockFrame.Parent = combatContent
 
-local espLabel = Instance.new("TextLabel")
-espLabel.Name = "ESPLabel"
-espLabel.Size = UDim2.new(0.6, 0, 1, 0)
-espLabel.Position = UDim2.new(0, 10, 0, 0)
-espLabel.BackgroundTransparency = 1
-espLabel.Text = "ESP"
-espLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-espLabel.TextSize = 18
-espLabel.Font = Enum.Font.GothamBold
-espLabel.TextXAlignment = Enum.TextXAlignment.Left
-espLabel.Parent = espFrame
+local aimLockCorner = Instance.new("UICorner")
+aimLockCorner.CornerRadius = UDim.new(0, 8)
+aimLockCorner.Parent = aimLockFrame
 
-local espToggleButton = Instance.new("TextButton")
-espToggleButton.Name = "ESPToggleButton"
-espToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
-espToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
-espToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
-espToggleButton.Text = "Enable"
-espToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-espToggleButton.TextSize = 15
-espToggleButton.Font = Enum.Font.Gotham
-espToggleButton.Parent = espFrame
+local aimLockLabel = Instance.new("TextLabel")
+aimLockLabel.Name = "AimLockLabel"
+aimLockLabel.Size = UDim2.new(0.6, 0, 1, 0)
+aimLockLabel.Position = UDim2.new(0, 10, 0, 0)
+aimLockLabel.BackgroundTransparency = 1
+aimLockLabel.Text = "AimLock"
+aimLockLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+aimLockLabel.TextSize = 18
+aimLockLabel.Font = Enum.Font.GothamBold
+aimLockLabel.TextXAlignment = Enum.TextXAlignment.Left
+aimLockLabel.Parent = aimLockFrame
 
-local espToggleCorner = Instance.new("UICorner")
-espToggleCorner.CornerRadius = UDim.new(0, 8)
-espToggleCorner.Parent = espToggleButton
+local aimLockToggleButton = Instance.new("TextButton")
+aimLockToggleButton.Name = "AimLockToggleButton"
+aimLockToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+aimLockToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+aimLockToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+aimLockToggleButton.Text = "Enable"
+aimLockToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+aimLockToggleButton.TextSize = 15
+aimLockToggleButton.Font = Enum.Font.Gotham
+aimLockToggleButton.Parent = aimLockFrame
 
-local espEnabled = false
-local espHighlights = {}
+local aimLockToggleCorner = Instance.new("UICorner")
+aimLockToggleCorner.CornerRadius = UDim.new(0, 6)
+aimLockToggleCorner.Parent = aimLockToggleButton
 
-local function addESPToPlayer(targetPlayer)
-	if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
-		if not espHighlights[targetPlayer] then
-			local highlight = Instance.new('Highlight')
-			highlight.Name = "ESPHighlight"
-			highlight.Parent = targetPlayer.Character
-			highlight.FillColor = Color3.new(1, 1, 1)
-			highlight.FillTransparency = 0.5
-			highlight.OutlineColor = Color3.new(1, 1, 1)
-			highlight.OutlineTransparency = 0
-			espHighlights[targetPlayer] = highlight
+-- AimLock Logic
+local mouse = player:GetMouse()
+local aimLockEnabled = false
+local Aiming = false
+
+aimLockToggleButton.MouseButton1Click:Connect(function()
+	aimLockEnabled = not aimLockEnabled
+	aimLockToggleButton.Text = aimLockEnabled and "Disable" or "Enable"
+	aimLockToggleButton.BackgroundColor3 = aimLockEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if not aimLockEnabled then
+		Aiming = false
+	end
+end)
+
+function AimLock()
+	local target
+	local lastMagnitude = math.huge
+	for _, v in pairs(game.Players:GetPlayers()) do
+		if v ~= player and v.Character and v.Character.PrimaryPart then
+			local charPos = v.Character.PrimaryPart.Position
+			local mousePos = mouse.Hit.p
+			if (charPos - mousePos).Magnitude < lastMagnitude then
+				lastMagnitude = (charPos - mousePos).Magnitude
+				target = v
+			end
 		end
 	end
-end
 
-local function removeESPFromPlayer(targetPlayer)
-	if espHighlights[targetPlayer] then
-		espHighlights[targetPlayer]:Destroy()
-		espHighlights[targetPlayer] = nil
+	if target and target.Character and target.Character.PrimaryPart then
+		local charPos = target.Character.PrimaryPart.Position
+		local cam = workspace.CurrentCamera
+		local pos = cam.CFrame.Position
+		workspace.CurrentCamera.CFrame = CFrame.new(pos, charPos)
 	end
 end
-
-local function updateESP()
-	for _, p in pairs(game.Players:GetPlayers()) do
-		if espEnabled then
-			addESPToPlayer(p)
-		else
-			removeESPFromPlayer(p)
-		end
-	end
-end
-
-espToggleButton.MouseButton1Click:Connect(function()
-	espEnabled = not espEnabled
-	espToggleButton.Text = espEnabled and "Disable" or "Enable"
-	updateESP()
-end)
-
-game.Players.PlayerAdded:Connect(function(plr)
-	plr.CharacterAdded:Connect(function()
-		if espEnabled then
-			wait(0.1)
-			addESPToPlayer(plr)
-		end
-	end)
-end)
-game.Players.PlayerRemoving:Connect(function(plr)
-	removeESPFromPlayer(plr)
-end)
-
-for _, plr in pairs(game.Players:GetPlayers()) do
-	plr.CharacterAdded:Connect(function()
-		if espEnabled then
-			wait(0.1)
-			addESPToPlayer(plr)
-		else
-			removeESPFromPlayer(plr)
-		end
-	end)
-end
-
-local currentHumanoid
-local function updateHumanoid()
-	if player.Character then
-		currentHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if currentHumanoid then
-			walkSpeedSlider.Text = tostring(currentHumanoid.WalkSpeed)
-			walkSpeedLabel.Text = "Walk Speed: "..tostring(currentHumanoid.WalkSpeed)
-			jumpPowerSlider.Text = tostring(currentHumanoid.JumpPower)
-			jumpPowerLabel.Text = "Jump Power: "..tostring(currentHumanoid.JumpPower)
-		end
-	end
-end
-walkSpeedButton.MouseButton1Click:Connect(function()
-	local speed = tonumber(walkSpeedSlider.Text)
-	if speed and speed > 0 and currentHumanoid then
-		currentHumanoid.WalkSpeed = speed
-		walkSpeedLabel.Text = "Walk Speed: "..tostring(speed)
-	else
-		walkSpeedSlider.Text = "Invalid"
-	end
-end)
-jumpPowerButton.MouseButton1Click:Connect(function()
-	local power = tonumber(jumpPowerSlider.Text)
-	if power and power > 0 and currentHumanoid then
-		currentHumanoid.JumpPower = power
-		jumpPowerLabel.Text = "Jump Power: "..tostring(power)
-	else
-		jumpPowerSlider.Text = "Invalid"
-	end
-end)
-player.CharacterAdded:Connect(function(character)
-	character:WaitForChild("Humanoid")
-	updateHumanoid()
-end)
-if player.Character then updateHumanoid() end
-player.CharacterAdded:Connect(function(character)
-	local humanoid = character:WaitForChild("Humanoid")
-	walkSpeedSlider.Text = tostring(humanoid.WalkSpeed)
-	walkSpeedLabel.Text = "Walk Speed: "..tostring(humanoid.WalkSpeed)
-	jumpPowerSlider.Text = tostring(humanoid.JumpPower)
-	jumpPowerLabel.Text = "Jump Power: "..tostring(humanoid.JumpPower)
-end)
-
-local themes = {
-	dark = {
-		menuBackground = Color3.fromRGB(30, 30, 40),
-		titleBarBackground = Color3.fromRGB(45, 45, 60),
-		tabButtonsBackground = Color3.fromRGB(38, 38, 50),
-		tabButtonBackground = Color3.fromRGB(60, 60, 90),
-		contentBackground = Color3.fromRGB(35, 35, 47),
-		textColor = Color3.fromRGB(255, 255, 255),
-		controlFrameBackground = Color3.fromRGB(45, 45, 60),
-		controlInputBackground = Color3.fromRGB(70, 70, 100),
-		controlButtonBackground = Color3.fromRGB(120, 120, 180),
-		themeButtonText = "Light Theme"
-	},
-	light = {
-		menuBackground = Color3.fromRGB(240, 240, 255),
-		titleBarBackground = Color3.fromRGB(210, 210, 240),
-		tabButtonsBackground = Color3.fromRGB(220, 220, 240),
-		tabButtonBackground = Color3.fromRGB(180, 180, 220),
-		contentBackground = Color3.fromRGB(240, 240, 255),
-		textColor = Color3.fromRGB(30, 30, 50),
-		controlFrameBackground = Color3.fromRGB(220, 220, 240),
-		controlInputBackground = Color3.fromRGB(180, 180, 220),
-		controlButtonBackground = Color3.fromRGB(160, 160, 200),
-		themeButtonText = "Dark Theme"
-	}
-}
-local currentTheme = "dark"
-local function applyTheme(themeName)
-	local theme = themes[themeName]
-	menuFrame.BackgroundColor3 = theme.menuBackground
-	titleBar.BackgroundColor3 = theme.titleBarBackground
-	tabButtonsFrame.BackgroundColor3 = theme.tabButtonsBackground
-	playerTabButton.BackgroundColor3 = theme.tabButtonBackground
-	playerTabButton.TextColor3 = theme.textColor
-	visualsTabButton.BackgroundColor3 = theme.tabButtonBackground
-	visualsTabButton.TextColor3 = theme.textColor
-	contentFrame.BackgroundColor3 = theme.contentBackground
-	titleText.TextColor3 = theme.textColor
-	walkSpeedFrame.BackgroundColor3 = theme.controlFrameBackground
-	walkSpeedLabel.TextColor3 = theme.textColor
-	walkSpeedSlider.BackgroundColor3 = theme.controlInputBackground
-	walkSpeedSlider.TextColor3 = theme.textColor
-	walkSpeedButton.BackgroundColor3 = theme.controlButtonBackground
-	walkSpeedButton.TextColor3 = theme.textColor
-	jumpPowerFrame.BackgroundColor3 = theme.controlFrameBackground
-	jumpPowerLabel.TextColor3 = theme.textColor
-	jumpPowerSlider.BackgroundColor3 = theme.controlInputBackground
-	jumpPowerSlider.TextColor3 = theme.textColor
-	jumpPowerButton.BackgroundColor3 = theme.controlButtonBackground
-	jumpPowerButton.TextColor3 = theme.textColor
-	spinFrame.BackgroundColor3 = theme.controlFrameBackground
-	spinLabel.TextColor3 = theme.textColor
-	spinSpeedBox.BackgroundColor3 = theme.controlInputBackground
-	spinSpeedBox.TextColor3 = theme.textColor
-	spinToggle.BackgroundColor3 = theme.controlButtonBackground
-	spinToggle.TextColor3 = theme.textColor
-	infiniteJumpFrame.BackgroundColor3 = theme.controlFrameBackground
-	infiniteJumpLabel.TextColor3 = theme.textColor
-	infiniteJumpToggleButton.BackgroundColor3 = theme.controlButtonBackground
-	infiniteJumpToggleButton.TextColor3 = theme.textColor
-	espFrame.BackgroundColor3 = theme.controlFrameBackground
-	espLabel.TextColor3 = theme.textColor
-	espToggleButton.BackgroundColor3 = theme.controlButtonBackground
-	espToggleButton.TextColor3 = theme.textColor
-	themeToggleButton.Text = theme.themeButtonText
-end
-applyTheme(currentTheme)
-themeToggleButton.MouseButton1Click:Connect(function()
-	currentTheme = (currentTheme == "dark") and "light" or "dark"
-	applyTheme(currentTheme)
-end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.RightControl then
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
+		if aimLockEnabled then
+			Aiming = not Aiming
+		end
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if aimLockEnabled and Aiming then
+		AimLock()
+	end
+end)
+
+-- Открытие/закрытие меню на клавишу RightShift
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
 		menuFrame.Visible = not menuFrame.Visible
 	end
 end)
