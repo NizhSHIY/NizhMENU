@@ -119,6 +119,40 @@ visualsContent.BackgroundTransparency = 1
 visualsContent.Visible = false
 visualsContent.Parent = contentFrame
 
+visualsTabButton.MouseButton1Click:Connect(function()
+	visualsContent.Visible = true
+	playerContent.Visible = false
+end)
+playerTabButton.MouseButton1Click:Connect(function()
+	visualsContent.Visible = false
+	playerContent.Visible = true
+end)
+
+local dragging, dragInput, dragStart, startPos
+titleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = menuFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+titleBar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		menuFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
 local functionFrameHeight = 54
 local functionFrameSpacing = 10
 
@@ -308,7 +342,6 @@ spinToggle.MouseButton1Click:Connect(function()
 		if spinConnection then spinConnection:Disconnect() spinConnection = nil end
 	end
 end)
-
 spinSpeedBox.FocusLost:Connect(function(enter)
 	if spinEnabled then
 		spinSpeed = tonumber(spinSpeedBox.Text) or 0
@@ -316,8 +349,162 @@ spinSpeedBox.FocusLost:Connect(function(enter)
 	end
 end)
 
-local currentHumanoid
+local infiniteJumpFrame = Instance.new("Frame")
+infiniteJumpFrame.Name = "InfiniteJumpFrame"
+infiniteJumpFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+infiniteJumpFrame.Position = UDim2.new(0.025, 0, 0, spinFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+infiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+infiniteJumpFrame.Parent = playerContent
 
+local infiniteJumpCorner = Instance.new("UICorner")
+infiniteJumpCorner.CornerRadius = UDim.new(0, 8)
+infiniteJumpCorner.Parent = infiniteJumpFrame
+
+local infiniteJumpLabel = Instance.new("TextLabel")
+infiniteJumpLabel.Name = "InfiniteJumpLabel"
+infiniteJumpLabel.Size = UDim2.new(0.6, 0, 1, 0)
+infiniteJumpLabel.Position = UDim2.new(0, 10, 0, 0)
+infiniteJumpLabel.BackgroundTransparency = 1
+infiniteJumpLabel.Text = "Infinite Jump"
+infiniteJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteJumpLabel.TextSize = 18
+infiniteJumpLabel.Font = Enum.Font.GothamBold
+infiniteJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
+infiniteJumpLabel.Parent = infiniteJumpFrame
+
+local infiniteJumpToggleButton = Instance.new("TextButton")
+infiniteJumpToggleButton.Name = "InfiniteJumpToggleButton"
+infiniteJumpToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+infiniteJumpToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+infiniteJumpToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+infiniteJumpToggleButton.Text = "Enable"
+infiniteJumpToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteJumpToggleButton.TextSize = 15
+infiniteJumpToggleButton.Font = Enum.Font.Gotham
+infiniteJumpToggleButton.Parent = infiniteJumpFrame
+
+local infiniteJumpToggleCorner = Instance.new("UICorner")
+infiniteJumpToggleCorner.CornerRadius = UDim.new(0, 8)
+infiniteJumpToggleCorner.Parent = infiniteJumpToggleButton
+
+local infiniteJumpEnabled = false
+local UserInputService = game:GetService("UserInputService")
+infiniteJumpToggleButton.MouseButton1Click:Connect(function()
+	infiniteJumpEnabled = not infiniteJumpEnabled
+	infiniteJumpToggleButton.Text = infiniteJumpEnabled and "Disable" or "Enable"
+end)
+UserInputService.JumpRequest:Connect(function()
+	if infiniteJumpEnabled then
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+local espFrame = Instance.new("Frame")
+espFrame.Name = "ESPFrame"
+espFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+espFrame.Position = UDim2.new(0.025, 0, 0.05, 0)
+espFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+espFrame.Parent = visualsContent
+
+local espCorner = Instance.new("UICorner")
+espCorner.CornerRadius = UDim.new(0, 8)
+espCorner.Parent = espFrame
+
+local espLabel = Instance.new("TextLabel")
+espLabel.Name = "ESPLabel"
+espLabel.Size = UDim2.new(0.6, 0, 1, 0)
+espLabel.Position = UDim2.new(0, 10, 0, 0)
+espLabel.BackgroundTransparency = 1
+espLabel.Text = "ESP"
+espLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+espLabel.TextSize = 18
+espLabel.Font = Enum.Font.GothamBold
+espLabel.TextXAlignment = Enum.TextXAlignment.Left
+espLabel.Parent = espFrame
+
+local espToggleButton = Instance.new("TextButton")
+espToggleButton.Name = "ESPToggleButton"
+espToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+espToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+espToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+espToggleButton.Text = "Enable"
+espToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+espToggleButton.TextSize = 15
+espToggleButton.Font = Enum.Font.Gotham
+espToggleButton.Parent = espFrame
+
+local espToggleCorner = Instance.new("UICorner")
+espToggleCorner.CornerRadius = UDim.new(0, 8)
+espToggleCorner.Parent = espToggleButton
+
+local espEnabled = false
+local espHighlights = {}
+
+local function addESPToPlayer(targetPlayer)
+	if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+		if not espHighlights[targetPlayer] then
+			local highlight = Instance.new('Highlight')
+			highlight.Name = "ESPHighlight"
+			highlight.Parent = targetPlayer.Character
+			highlight.FillColor = Color3.new(1, 1, 1)
+			highlight.FillTransparency = 0.5
+			highlight.OutlineColor = Color3.new(1, 1, 1)
+			highlight.OutlineTransparency = 0
+			espHighlights[targetPlayer] = highlight
+		end
+	end
+end
+
+local function removeESPFromPlayer(targetPlayer)
+	if espHighlights[targetPlayer] then
+		espHighlights[targetPlayer]:Destroy()
+		espHighlights[targetPlayer] = nil
+	end
+end
+
+local function updateESP()
+	for _, p in pairs(game.Players:GetPlayers()) do
+		if espEnabled then
+			addESPToPlayer(p)
+		else
+			removeESPFromPlayer(p)
+		end
+	end
+end
+
+espToggleButton.MouseButton1Click:Connect(function()
+	espEnabled = not espEnabled
+	espToggleButton.Text = espEnabled and "Disable" or "Enable"
+	updateESP()
+end)
+
+game.Players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function()
+		if espEnabled then
+			wait(0.1)
+			addESPToPlayer(plr)
+		end
+	end)
+end)
+game.Players.PlayerRemoving:Connect(function(plr)
+	removeESPFromPlayer(plr)
+end)
+
+for _, plr in pairs(game.Players:GetPlayers()) do
+	plr.CharacterAdded:Connect(function()
+		if espEnabled then
+			wait(0.1)
+			addESPToPlayer(plr)
+		else
+			removeESPFromPlayer(plr)
+		end
+	end)
+end
+
+local currentHumanoid
 local function updateHumanoid()
 	if player.Character then
 		currentHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
@@ -329,7 +516,6 @@ local function updateHumanoid()
 		end
 	end
 end
-
 walkSpeedButton.MouseButton1Click:Connect(function()
 	local speed = tonumber(walkSpeedSlider.Text)
 	if speed and speed > 0 and currentHumanoid then
@@ -339,7 +525,6 @@ walkSpeedButton.MouseButton1Click:Connect(function()
 		walkSpeedSlider.Text = "Invalid"
 	end
 end)
-
 jumpPowerButton.MouseButton1Click:Connect(function()
 	local power = tonumber(jumpPowerSlider.Text)
 	if power and power > 0 and currentHumanoid then
@@ -349,16 +534,11 @@ jumpPowerButton.MouseButton1Click:Connect(function()
 		jumpPowerSlider.Text = "Invalid"
 	end
 end)
-
 player.CharacterAdded:Connect(function(character)
 	character:WaitForChild("Humanoid")
 	updateHumanoid()
 end)
-
-if player.Character then
-	updateHumanoid()
-end
-
+if player.Character then updateHumanoid() end
 player.CharacterAdded:Connect(function(character)
 	local humanoid = character:WaitForChild("Humanoid")
 	walkSpeedSlider.Text = tostring(humanoid.WalkSpeed)
@@ -393,9 +573,7 @@ local themes = {
 		themeButtonText = "Dark Theme"
 	}
 }
-
 local currentTheme = "dark"
-
 local function applyTheme(themeName)
 	local theme = themes[themeName]
 	menuFrame.BackgroundColor3 = theme.menuBackground
@@ -425,74 +603,25 @@ local function applyTheme(themeName)
 	spinSpeedBox.TextColor3 = theme.textColor
 	spinToggle.BackgroundColor3 = theme.controlButtonBackground
 	spinToggle.TextColor3 = theme.textColor
+	infiniteJumpFrame.BackgroundColor3 = theme.controlFrameBackground
+	infiniteJumpLabel.TextColor3 = theme.textColor
+	infiniteJumpToggleButton.BackgroundColor3 = theme.controlButtonBackground
+	infiniteJumpToggleButton.TextColor3 = theme.textColor
+	espFrame.BackgroundColor3 = theme.controlFrameBackground
+	espLabel.TextColor3 = theme.textColor
+	espToggleButton.BackgroundColor3 = theme.controlButtonBackground
+	espToggleButton.TextColor3 = theme.textColor
 	themeToggleButton.Text = theme.themeButtonText
-	currentTheme = themeName
 end
-
-applyTheme("dark")
-
+applyTheme(currentTheme)
 themeToggleButton.MouseButton1Click:Connect(function()
-	if currentTheme == "dark" then
-		applyTheme("light")
-	else
-		applyTheme("dark")
-	end
+	currentTheme = (currentTheme == "dark") and "light" or "dark"
+	applyTheme(currentTheme)
 end)
 
-local userInputService = game:GetService("UserInputService")
-local dragging = false
-local dragStartPos
-local startPos
-local connection
-
-titleBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStartPos = input.Position
-		startPos = menuFrame.Position
-		connection = userInputService.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
-				local delta = input.Position - dragStartPos
-				menuFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-			end
-		end)
-	end
-end)
-
-userInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-		if connection then
-			connection:Disconnect()
-			connection = nil
-		end
-	end
-end)
-
-userInputService.InputBegan:Connect(function(input)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.RightControl then
 		menuFrame.Visible = not menuFrame.Visible
-	end
-end)
-
-playerTabButton.MouseButton1Click:Connect(function()
-	playerContent.Visible = true
-	visualsContent.Visible = false
-	playerTabButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
-	visualsTabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
-	if currentTheme == "light" then
-		playerTabButton.BackgroundColor3 = Color3.fromRGB(160, 160, 200)
-		visualsTabButton.BackgroundColor3 = Color3.fromRGB(180, 180, 220)
-	end
-end)
-
-visualsTabButton.MouseButton1Click:Connect(function()
-	playerContent.Visible = false
-	visualsContent.Visible = true
-	playerTabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
-	visualsTabButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
-	if currentTheme == "light" then
-		playerTabButton.BackgroundColor3 = Color3.fromRGB(180, 180, 220)
-		visualsTabButton.BackgroundColor3 = Color3.fromRGB(160, 160, 200)
 	end
 end)
