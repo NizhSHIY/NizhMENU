@@ -1,4 +1,3 @@
--- NizhMENU (Visuals: ESP+Light, Player: все функции, Combat: AimLock)
 local player = game.Players.LocalPlayer
 local players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -9,10 +8,38 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "NizhMENU"
 screenGui.Parent = playerGui
 
+local openGui = Instance.new("ScreenGui")
+openGui.Name = "OpenGui"
+openGui.Parent = playerGui
+openGui.Enabled = false
+
+local openFrame = Instance.new("Frame")
+openFrame.Name = "OpenFrame"
+openFrame.BackgroundTransparency = 1
+openFrame.Position = UDim2.new(0.095, 0, 0.250, 0)
+openFrame.Size = UDim2.new(0, 30, 0, 30)
+openFrame.Parent = openGui
+
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenButton"
+openButton.Position = UDim2.new(0, 0, 0, 0)
+openButton.Size = UDim2.new(1, 0, 1, 0)
+openButton.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
+openButton.Font = Enum.Font.Merriweather
+openButton.FontFace.Style = Enum.FontStyle.Italic
+openButton.Text = "N"
+openButton.TextColor3 = Color3.fromRGB(221, 255, 255)
+openButton.TextScaled = true
+openButton.Parent = openFrame
+
+local openCorner = Instance.new("UICorner")
+openCorner.CornerRadius = UDim.new(1, 0)
+openCorner.Parent = openButton
+
 local menuFrame = Instance.new("Frame")
 menuFrame.Name = "MenuFrame"
 menuFrame.Size = UDim2.new(0, 420, 0, 320)
-menuFrame.Position = UDim2.new(0.5, -210, 0.5, -160)
+menuFrame.Position = UDim2.new(0.49, -210, 0.491, -160)
 menuFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 menuFrame.Visible = false
 menuFrame.Parent = screenGui
@@ -220,7 +247,7 @@ local highlights = {}
 local function addHighlight(char)
 	if highlights[char] then return end
 	local highlight = Instance.new("Highlight")
-	highlight.FillColor = Color3.fromRGB(235, 235, 235)
+	highlight.FillColor = Color3.fromRGB(220, 220, 220)
 	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
 	highlight.Parent = char
 	highlights[char] = highlight
@@ -637,11 +664,14 @@ local aimLockToggleCorner = Instance.new("UICorner")
 aimLockToggleCorner.CornerRadius = UDim.new(0, 6)
 aimLockToggleCorner.Parent = aimLockToggleButton
 
--- Открытие/закрытие меню на клавишу RightShift
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
 		menuFrame.Visible = not menuFrame.Visible
 	end
+end)
+
+openButton.TouchTap:Connect(function()
+	menuFrame.Visible = not menuFrame.Visible
 end)
 
 local player = game.Players.LocalPlayer
@@ -684,3 +714,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		AimLock()
 	end
 end)
+
+if UserInputService.TouchEnabled then
+	openGui.Enabled = true
+end
