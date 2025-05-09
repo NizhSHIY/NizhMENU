@@ -689,7 +689,7 @@ end)
 
 -- Открытие/закрытие меню на клавишу RightShift
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
 		menuFrame.Visible = not menuFrame.Visible
 	end
 end)
