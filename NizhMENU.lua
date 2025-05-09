@@ -622,12 +622,12 @@ aimLockLabel.Font = Enum.Font.GothamBold
 aimLockLabel.TextXAlignment = Enum.TextXAlignment.Left
 aimLockLabel.Parent = aimLockFrame
 
-local aimLockToggleButton = Instance.new("TextButton")
+local aimLockToggleButton = Instance.new("TextLabel")
 aimLockToggleButton.Name = "AimLockToggleButton"
 aimLockToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
 aimLockToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
 aimLockToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
-aimLockToggleButton.Text = "Enable"
+aimLockToggleButton.Text = "Press B"
 aimLockToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 aimLockToggleButton.TextSize = 15
 aimLockToggleButton.Font = Enum.Font.Gotham
@@ -637,19 +637,16 @@ local aimLockToggleCorner = Instance.new("UICorner")
 aimLockToggleCorner.CornerRadius = UDim.new(0, 6)
 aimLockToggleCorner.Parent = aimLockToggleButton
 
--- AimLock Logic
-local mouse = player:GetMouse()
-local aimLockEnabled = false
-local Aiming = false
-
-aimLockToggleButton.MouseButton1Click:Connect(function()
-	aimLockEnabled = not aimLockEnabled
-	aimLockToggleButton.Text = aimLockEnabled and "Disable" or "Enable"
-	aimLockToggleButton.BackgroundColor3 = aimLockEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
-	if not aimLockEnabled then
-		Aiming = false
+-- Открытие/закрытие меню на клавишу RightShift
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
+		menuFrame.Visible = not menuFrame.Visible
 	end
 end)
+
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local Aiming = false
 
 function AimLock()
 	local target
@@ -669,27 +666,21 @@ function AimLock()
 		local charPos = target.Character.PrimaryPart.Position
 		local cam = workspace.CurrentCamera
 		local pos = cam.CFrame.Position
+
 		workspace.CurrentCamera.CFrame = CFrame.new(pos, charPos)
 	end
 end
 
+local UserInputService = game:GetService("UserInputService")
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.E then
-		if aimLockEnabled then
-			Aiming = not Aiming
-		end
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.B then
+		Aiming = not Aiming 
 	end
 end)
 
-RunService.RenderStepped:Connect(function()
-	if aimLockEnabled and Aiming then
+game:GetService("RunService").RenderStepped:Connect(function()
+	if Aiming then
 		AimLock()
-	end
-end)
-
--- Открытие/закрытие меню на клавишу RightShift
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
-		menuFrame.Visible = not menuFrame.Visible
 	end
 end)
