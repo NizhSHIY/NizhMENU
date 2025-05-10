@@ -527,8 +527,8 @@ spinLabel.Parent = spinCenter
 
 local spinSpeedBox = Instance.new("TextBox")
 spinSpeedBox.Name = "SpinSpeedBox"
-spinSpeedBox.Size = UDim2.new(0.33, 0, 1, 0)
-spinSpeedBox.Position = UDim2.new(0.33, 0, 0, 0)
+spinSpeedBox.Size = UDim2.new(0.3, 0, 0.6, 0)
+spinSpeedBox.Position = UDim2.new(0.35, 0, 0.2, 0)
 spinSpeedBox.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
 spinSpeedBox.Text = "0"
 spinSpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -542,8 +542,8 @@ spinSpeedBoxCorner.Parent = spinSpeedBox
 
 local spinToggle = Instance.new("TextButton")
 spinToggle.Name = "SpinToggle"
-spinToggle.Size = UDim2.new(0.33, 0, 1, 0)
-spinToggle.Position = UDim2.new(0.66, 0, 0, 0)
+spinToggle.Size = UDim2.new(0.3, 0, 0.6, 0)
+spinToggle.Position = UDim2.new(0.70, 0, 0.2, 0)
 spinToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
 spinToggle.Text = "Enable"
 spinToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
