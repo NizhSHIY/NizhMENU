@@ -244,20 +244,28 @@ espToggleCorner.CornerRadius = UDim.new(0, 6)
 espToggleCorner.Parent = espToggleButton
 
 local highlights = {}
+
 local function addHighlight(char)
 	if highlights[char] then return end
+	local player = game.Players:GetPlayerFromCharacter(char)
+	if not player or not player.Team then return end
 	local highlight = Instance.new("Highlight")
-	highlight.FillColor = Color3.fromRGB(220, 220, 220)
-	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+	local teamColor = player.Team.TeamColor.Color
+
+	highlight.FillColor = teamColor
+	highlight.OutlineColor = teamColor
+
 	highlight.Parent = char
 	highlights[char] = highlight
 end
+
 local function removeHighlight(char)
 	if highlights[char] then
 		highlights[char]:Destroy()
 		highlights[char] = nil
 	end
 end
+
 
 local espEnabled = false
 espToggleButton.MouseButton1Click:Connect(function()
@@ -625,7 +633,6 @@ end)
 
 -- ================= COMBAT TAB =================
 
--- AimLock Frame
 local aimLockFrame = Instance.new("Frame")
 aimLockFrame.Name = "AimLockFrame"
 aimLockFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
@@ -671,6 +678,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 openButton.TouchTap:Connect(function()
+	menuFrame.Visible = not menuFrame.Visible
+end)
+
+openButton.MouseButton1Click:Connect(function()
 	menuFrame.Visible = not menuFrame.Visible
 end)
 
