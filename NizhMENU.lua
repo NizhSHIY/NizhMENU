@@ -152,12 +152,20 @@ playerContent.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
 playerContent.ClipsDescendants = true
 
 
-local visualsContent = Instance.new("Frame")
+local visualsContent = Instance.new("ScrollingFrame")
 visualsContent.Name = "VisualsContent"
 visualsContent.Size = UDim2.new(1, 0, 1, 0)
 visualsContent.BackgroundTransparency = 1
 visualsContent.Visible = false
 visualsContent.Parent = contentFrame
+
+visualsContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+visualsContent.ScrollBarThickness = 8
+visualsContent.ScrollBarImageColor3 = Color3.fromRGB(120, 120, 180)
+visualsContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+visualsContent.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+visualsContent.ClipsDescendants = true
+
 
 local combatContent = Instance.new("Frame")
 combatContent.Name = "CombatContent"
@@ -434,6 +442,67 @@ hideGuiToggleButton.MouseButton1Click:Connect(function()
 	end
 end)
 
+-- Time Changer Frame
+local timeFrame = Instance.new("Frame")
+timeFrame.Name = "TimeFrame"
+timeFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+timeFrame.Position = UDim2.new(0.025, 0, 0, hideGuiFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+timeFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+timeFrame.Parent = visualsContent
+
+local timeCorner = Instance.new("UICorner")
+timeCorner.CornerRadius = UDim.new(0, 8)
+timeCorner.Parent = timeFrame
+
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Name = "TimeLabel"
+timeLabel.Size = UDim2.new(0.6, 0, 0.4, 0)
+timeLabel.Position = UDim2.new(0, 10, 0, 0)
+timeLabel.BackgroundTransparency = 1
+timeLabel.Text = "Time Changer"
+timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+timeLabel.TextSize = 16
+timeLabel.Font = Enum.Font.GothamBold
+timeLabel.TextXAlignment = Enum.TextXAlignment.Left
+timeLabel.Parent = timeFrame
+
+local timeTextBox = Instance.new("TextBox")
+timeTextBox.Name = "TimeTextBox"
+timeTextBox.Size = UDim2.new(0.6, 0, 0.4, 0)
+timeTextBox.Position = UDim2.new(0.05, 0, 0.5, 0)
+timeTextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
+timeTextBox.Text = "12"
+timeTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+timeTextBox.TextSize = 13
+timeTextBox.Font = Enum.Font.Gotham
+timeTextBox.ClearTextOnFocus = false
+timeTextBox.Parent = timeFrame
+
+local timeTextBoxCorner = Instance.new("UICorner")
+timeTextBoxCorner.CornerRadius = UDim.new(0, 6)
+timeTextBoxCorner.Parent = timeTextBox
+
+local timeButton = Instance.new("TextButton")
+timeButton.Name = "TimeButton"
+timeButton.Size = UDim2.new(0.25, 0, 0.4, 0)
+timeButton.Position = UDim2.new(0.7, 0, 0.5, 0)
+timeButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+timeButton.Text = "Apply"
+timeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+timeButton.TextSize = 13
+timeButton.Font = Enum.Font.Gotham
+timeButton.Parent = timeFrame
+
+local timeButtonCorner = Instance.new("UICorner")
+timeButtonCorner.CornerRadius = UDim.new(0, 6)
+timeButtonCorner.Parent = timeButton
+
+timeButton.MouseButton1Click:Connect(function()
+	local timeValue = tonumber(timeTextBox.Text)
+	if timeValue and timeValue >= 0 and timeValue < 24 then
+		game:GetService("Lighting").TimeOfDay = string.format("%02d:00:00", math.floor(timeValue))
+	end
+end)
 
 
 -- ================= PLAYER TAB =================
@@ -888,6 +957,145 @@ end)
 player.CharacterRemoving:Connect(function()
 	if noclipEnabled then
 		disableNoclip()
+	end
+end)
+
+-- Fly Frame
+local flyFrame = Instance.new("Frame")
+flyFrame.Name = "FlyFrame"
+flyFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+flyFrame.Position = UDim2.new(0.025, 0, 0, noclipFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+flyFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+flyFrame.Parent = playerContent
+
+local flyCorner = Instance.new("UICorner")
+flyCorner.CornerRadius = UDim.new(0, 8)
+flyCorner.Parent = flyFrame
+
+local flyLabel = Instance.new("TextLabel")
+flyLabel.Name = "FlyLabel"
+flyLabel.Size = UDim2.new(0.6, 0, 0.4, 0)
+flyLabel.Position = UDim2.new(0, 10, 0, 0)
+flyLabel.BackgroundTransparency = 1
+flyLabel.Text = "Fly"
+flyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyLabel.TextSize = 16
+flyLabel.Font = Enum.Font.GothamBold
+flyLabel.TextXAlignment = Enum.TextXAlignment.Left
+flyLabel.Parent = flyFrame
+
+local flySpeedBox = Instance.new("TextBox")
+flySpeedBox.Name = "FlySpeedBox"
+flySpeedBox.Size = UDim2.new(0.4, 0, 0.4, 0)
+flySpeedBox.Position = UDim2.new(0.05, 0, 0.5, 0)
+flySpeedBox.BackgroundColor3 = Color3.fromRGB(70, 70, 100)
+flySpeedBox.Text = "50"
+flySpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+flySpeedBox.TextSize = 13
+flySpeedBox.Font = Enum.Font.Gotham
+flySpeedBox.ClearTextOnFocus = false
+flySpeedBox.Parent = flyFrame
+
+local flySpeedBoxCorner = Instance.new("UICorner")
+flySpeedBoxCorner.CornerRadius = UDim.new(0, 6)
+flySpeedBoxCorner.Parent = flySpeedBox
+
+local flyToggleButton = Instance.new("TextButton")
+flyToggleButton.Name = "FlyToggleButton"
+flyToggleButton.Size = UDim2.new(0.25, 0, 0.4, 0)
+flyToggleButton.Position = UDim2.new(0.7, 0, 0.5, 0)
+flyToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+flyToggleButton.Text = "Enable"
+flyToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyToggleButton.TextSize = 13
+flyToggleButton.Font = Enum.Font.Gotham
+flyToggleButton.Parent = flyFrame
+
+local flyToggleButtonCorner = Instance.new("UICorner")
+flyToggleButtonCorner.CornerRadius = UDim.new(0, 6)
+flyToggleButtonCorner.Parent = flyToggleButton
+
+local flying = false
+local bodyVelocity
+local flyLoop
+
+local function startFly()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+	local speed = tonumber(flySpeedBox.Text) or 50
+
+	bodyVelocity = Instance.new("BodyVelocity")
+	bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+	bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+	bodyVelocity.Parent = humanoidRootPart
+
+	flyLoop = game:GetService("RunService").RenderStepped:Connect(function()
+		local camera = workspace.CurrentCamera
+		local moveDirection = Vector3.new(0, 0, 0)
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+			moveDirection = moveDirection + camera.CFrame.LookVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+			moveDirection = moveDirection - camera.CFrame.LookVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+			moveDirection = moveDirection - camera.CFrame.RightVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+			moveDirection = moveDirection + camera.CFrame.RightVector
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+			moveDirection = moveDirection + Vector3.new(0, 1, 0)
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+			moveDirection = moveDirection - Vector3.new(0, 1, 0)
+		end
+
+		if moveDirection.Magnitude > 0 then
+			moveDirection = moveDirection.Unit * speed
+		else
+			moveDirection = Vector3.new(0, 0, 0)
+		end
+
+		bodyVelocity.Velocity = moveDirection
+	end)
+end
+
+local function stopFly()
+	if flyLoop then
+		flyLoop:Disconnect()
+		flyLoop = nil
+	end
+	if bodyVelocity then
+		bodyVelocity:Destroy()
+		bodyVelocity = nil
+	end
+end
+
+flyToggleButton.MouseButton1Click:Connect(function()
+	flying = not flying
+	flyToggleButton.Text = flying and "Disable" or "Enable"
+	flyToggleButton.BackgroundColor3 = flying and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if flying then
+		startFly()
+	else
+		stopFly()
+	end
+end)
+
+player.CharacterAdded:Connect(function()
+	if flying then
+		stopFly()
+		flying = false
+		flyToggleButton.Text = "Enable"
+		flyToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+	end
+end)
+
+flySpeedBox.FocusLost:Connect(function(enter)
+	if flying and enter then
+		stopFly()
+		startFly()
 	end
 end)
 
