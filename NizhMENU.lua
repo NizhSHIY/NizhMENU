@@ -714,7 +714,3 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		AimLock()
 	end
 end)
-
-if UserInputService.TouchEnabled then
-	openGui.Enabled = true
-end
