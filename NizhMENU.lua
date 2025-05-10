@@ -264,22 +264,22 @@ local highlights = {}
 local function addHighlight(char)
 	if highlights[char] then return end
 	local player = game.Players:GetPlayerFromCharacter(char)
-	if not player or not player.Team then return end
+	if not player then return end
+
 	local highlight = Instance.new("Highlight")
-	local teamColor = player.Team.TeamColor.Color
+	local teamColor
+
+	if player.Team and player.Team.TeamColor then
+		teamColor = player.Team.TeamColor.Color
+	else
+		teamColor = Color3.new(1, 1, 1) -- Белый цвет
+	end
 
 	highlight.FillColor = teamColor
 	highlight.OutlineColor = teamColor
 
 	highlight.Parent = char
 	highlights[char] = highlight
-end
-
-local function removeHighlight(char)
-	if highlights[char] then
-		highlights[char]:Destroy()
-		highlights[char] = nil
-	end
 end
 
 
