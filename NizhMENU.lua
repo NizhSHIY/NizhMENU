@@ -137,12 +137,20 @@ local contentCorner = Instance.new("UICorner")
 contentCorner.CornerRadius = UDim.new(0, 12)
 contentCorner.Parent = contentFrame
 
-local playerContent = Instance.new("Frame")
+local playerContent = Instance.new("ScrollingFrame")
 playerContent.Name = "PlayerContent"
 playerContent.Size = UDim2.new(1, 0, 1, 0)
 playerContent.BackgroundTransparency = 1
 playerContent.Visible = true
 playerContent.Parent = contentFrame
+
+playerContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+playerContent.ScrollBarThickness = 8
+playerContent.ScrollBarImageColor3 = Color3.fromRGB(120, 120, 180)
+playerContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+playerContent.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+playerContent.ClipsDescendants = true
+
 
 local visualsContent = Instance.new("Frame")
 visualsContent.Name = "VisualsContent"
@@ -630,6 +638,96 @@ UserInputService.JumpRequest:Connect(function()
 		end
 	end
 end)
+
+-- ================= CTRL+CLICK TP =================
+
+local tpFrame = Instance.new("Frame")
+tpFrame.Name = "CtrlClickTPFrame"
+tpFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+tpFrame.Position = UDim2.new(0.025, 0, 0, infiniteJumpFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+tpFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+tpFrame.Parent = playerContent
+
+local tpCorner = Instance.new("UICorner")
+tpCorner.CornerRadius = UDim.new(0, 8)
+tpCorner.Parent = tpFrame
+
+local tpLabel = Instance.new("TextLabel")
+tpLabel.Name = "CtrlClickTPLabel"
+tpLabel.Size = UDim2.new(0.6, 0, 1, 0)
+tpLabel.Position = UDim2.new(0, 10, 0, 0)
+tpLabel.BackgroundTransparency = 1
+tpLabel.Text = "Ctrl+Click Teleport"
+tpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+tpLabel.TextSize = 18
+tpLabel.Font = Enum.Font.GothamBold
+tpLabel.TextXAlignment = Enum.TextXAlignment.Left
+tpLabel.Parent = tpFrame
+
+local tpToggleButton = Instance.new("TextButton")
+tpToggleButton.Name = "CtrlClickTPToggleButton"
+tpToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+tpToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+tpToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+tpToggleButton.Text = "Enable"
+tpToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+tpToggleButton.TextSize = 15
+tpToggleButton.Font = Enum.Font.Gotham
+tpToggleButton.Parent = tpFrame
+
+local tpToggleCorner = Instance.new("UICorner")
+tpToggleCorner.CornerRadius = UDim.new(0, 6)
+tpToggleCorner.Parent = tpToggleButton
+
+local ctrlClickTPEnabled = false
+local mouse = player:GetMouse()
+
+local function teleportToPosition(position)
+	local character = player.Character
+	if character and character:FindFirstChild("HumanoidRootPart") then
+		local targetPosition = position + Vector3.new(0, 3, 0)
+		character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+	end
+end
+
+local mouseConn
+
+local function enableCtrlClickTP()
+	if mouseConn then return end
+	mouseConn = mouse.Button1Down:Connect(function()
+		if ctrlClickTPEnabled and (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)) then
+			local target = mouse.Hit
+			if target then
+				teleportToPosition(target.p)
+			end
+		end
+	end)
+end
+
+local function disableCtrlClickTP()
+	if mouseConn then
+		mouseConn:Disconnect()
+		mouseConn = nil
+	end
+end
+
+tpToggleButton.MouseButton1Click:Connect(function()
+	ctrlClickTPEnabled = not ctrlClickTPEnabled
+	tpToggleButton.Text = ctrlClickTPEnabled and "Disable" or "Enable"
+	tpToggleButton.BackgroundColor3 = ctrlClickTPEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if ctrlClickTPEnabled then
+		enableCtrlClickTP()
+	else
+		disableCtrlClickTP()
+	end
+end)
+
+player.AncestryChanged:Connect(function(_, parent)
+	if not parent then
+		disableCtrlClickTP()
+	end
+end)
+
 
 -- ================= COMBAT TAB =================
 
