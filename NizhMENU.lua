@@ -363,6 +363,79 @@ lightToggleButton.MouseButton1Click:Connect(function()
 	end
 end)
 
+-- Hide Gui Frame
+local hideGuiFrame = Instance.new("Frame")
+hideGuiFrame.Name = "HideGuiFrame"
+hideGuiFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+hideGuiFrame.Position = UDim2.new(0.025, 0, 0, lightFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+hideGuiFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+hideGuiFrame.Parent = visualsContent
+
+local hideGuiCorner = Instance.new("UICorner")
+hideGuiCorner.CornerRadius = UDim.new(0, 8)
+hideGuiCorner.Parent = hideGuiFrame
+
+local hideGuiLabel = Instance.new("TextLabel")
+hideGuiLabel.Name = "HideGuiLabel"
+hideGuiLabel.Size = UDim2.new(0.6, 0, 1, 0)
+hideGuiLabel.Position = UDim2.new(0, 10, 0, 0)
+hideGuiLabel.BackgroundTransparency = 1
+hideGuiLabel.Text = "Hide Gui"
+hideGuiLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+hideGuiLabel.TextSize = 18
+hideGuiLabel.Font = Enum.Font.GothamBold
+hideGuiLabel.TextXAlignment = Enum.TextXAlignment.Left
+hideGuiLabel.Parent = hideGuiFrame
+
+local hideGuiToggleButton = Instance.new("TextButton")
+hideGuiToggleButton.Name = "HideGuiToggleButton"
+hideGuiToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+hideGuiToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+hideGuiToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+hideGuiToggleButton.Text = "Hide"
+hideGuiToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+hideGuiToggleButton.TextSize = 15
+hideGuiToggleButton.Font = Enum.Font.Gotham
+hideGuiToggleButton.Parent = hideGuiFrame
+
+local hideGuiToggleCorner = Instance.new("UICorner")
+hideGuiToggleCorner.CornerRadius = UDim.new(0, 6)
+hideGuiToggleCorner.Parent = hideGuiToggleButton
+local guiHidden = false
+local hiddenGuis = {}
+
+local function hideOtherGuis()
+	hiddenGuis = {}
+	for _, gui in ipairs(player.PlayerGui:GetChildren()) do
+		if gui:IsA("ScreenGui") and gui ~= screenGui and gui ~= openGui and gui.Enabled then
+			gui.Enabled = false
+			table.insert(hiddenGuis, gui)
+		end
+	end
+end
+
+local function showOtherGuis()
+	for _, gui in ipairs(hiddenGuis) do
+		if gui and gui.Parent == player.PlayerGui then
+			gui.Enabled = true
+		end
+	end
+	hiddenGuis = {}
+end
+
+hideGuiToggleButton.MouseButton1Click:Connect(function()
+	guiHidden = not guiHidden
+	hideGuiToggleButton.Text = guiHidden and "Show" or "Hide"
+	hideGuiToggleButton.BackgroundColor3 = guiHidden and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if guiHidden then
+		hideOtherGuis()
+	else
+		showOtherGuis()
+	end
+end)
+
+
+
 -- ================= PLAYER TAB =================
 
 -- WalkSpeed Frame
@@ -727,6 +800,97 @@ player.AncestryChanged:Connect(function(_, parent)
 		disableCtrlClickTP()
 	end
 end)
+
+-- Noclip Frame
+local noclipFrame = Instance.new("Frame")
+noclipFrame.Name = "NoclipFrame"
+noclipFrame.Size = UDim2.new(0.95, 0, 0, functionFrameHeight)
+noclipFrame.Position = UDim2.new(0.025, 0, 0, tpFrame.Position.Y.Offset + functionFrameHeight + functionFrameSpacing)
+noclipFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+noclipFrame.Parent = playerContent
+
+local noclipCorner = Instance.new("UICorner")
+noclipCorner.CornerRadius = UDim.new(0, 8)
+noclipCorner.Parent = noclipFrame
+
+local noclipLabel = Instance.new("TextLabel")
+noclipLabel.Name = "NoclipLabel"
+noclipLabel.Size = UDim2.new(0.6, 0, 1, 0)
+noclipLabel.Position = UDim2.new(0, 10, 0, 0)
+noclipLabel.BackgroundTransparency = 1
+noclipLabel.Text = "Noclip"
+noclipLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+noclipLabel.TextSize = 18
+noclipLabel.Font = Enum.Font.GothamBold
+noclipLabel.TextXAlignment = Enum.TextXAlignment.Left
+noclipLabel.Parent = noclipFrame
+
+local noclipToggleButton = Instance.new("TextButton")
+noclipToggleButton.Name = "NoclipToggleButton"
+noclipToggleButton.Size = UDim2.new(0.3, 0, 0.6, 0)
+noclipToggleButton.Position = UDim2.new(0.65, 0, 0.2, 0)
+noclipToggleButton.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+noclipToggleButton.Text = "Enable"
+noclipToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+noclipToggleButton.TextSize = 15
+noclipToggleButton.Font = Enum.Font.Gotham
+noclipToggleButton.Parent = noclipFrame
+
+local noclipToggleCorner = Instance.new("UICorner")
+noclipToggleCorner.CornerRadius = UDim.new(0, 6)
+noclipToggleCorner.Parent = noclipToggleButton
+
+local noclipEnabled = false
+local noclipConnection
+
+local function enableNoclip()
+	if noclipConnection then return end
+	noclipEnabled = true
+	noclipConnection = RunService.Stepped:Connect(function()
+		local character = player.Character
+		if character then
+			for _, part in pairs(character:GetDescendants()) do
+				if part:IsA("BasePart") and part.CanCollide then
+					part.CanCollide = false
+				end
+			end
+		end
+	end)
+end
+
+local function disableNoclip()
+	noclipEnabled = false
+	if noclipConnection then
+		noclipConnection:Disconnect()
+		noclipConnection = nil
+	end
+	local character = player.Character
+	if character then
+		for _, part in pairs(character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = true
+			end
+		end
+	end
+end
+
+noclipToggleButton.MouseButton1Click:Connect(function()
+	noclipEnabled = not noclipEnabled
+	noclipToggleButton.Text = noclipEnabled and "Disable" or "Enable"
+	noclipToggleButton.BackgroundColor3 = noclipEnabled and Color3.fromRGB(180, 80, 80) or Color3.fromRGB(120, 120, 180)
+	if noclipEnabled then
+		enableNoclip()
+	else
+		disableNoclip()
+	end
+end)
+
+player.CharacterRemoving:Connect(function()
+	if noclipEnabled then
+		disableNoclip()
+	end
+end)
+
 
 
 -- ================= COMBAT TAB =================
