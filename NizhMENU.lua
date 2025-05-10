@@ -11,7 +11,7 @@ screenGui.Parent = playerGui
 local openGui = Instance.new("ScreenGui")
 openGui.Name = "OpenGui"
 openGui.Parent = playerGui
-openGui.Enabled = false
+openGui.Enabled = true
 
 local openFrame = Instance.new("Frame")
 openFrame.Name = "OpenFrame"
