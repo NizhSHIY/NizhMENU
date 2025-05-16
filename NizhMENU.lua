@@ -35,8 +35,8 @@ local Window = Rayfield:CreateWindow({
     KeySystem = false
 })
 
-local VisualsTab = Window:CreateTab("Visuals", 4483362458)
-local PlayerTab = Window:CreateTab("Player", 4483362458)
+local VisualsTab = Window:CreateTab("Visuals", 14321059132)
+local PlayerTab = Window:CreateTab("Player", 14321085517)
 local OtherTab = Window:CreateTab("Other", 4483362458)
 
 ---------------- VISUALS ----------------
