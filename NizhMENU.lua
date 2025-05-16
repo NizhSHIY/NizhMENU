@@ -333,27 +333,6 @@ PlayerTab:CreateSlider({
     end,
 })
 
--- Spin
-PlayerTab:CreateToggle({
-    Name = "Spin (вращение персонажа)",
-    CurrentValue = false,
-    Flag = "SpinToggle",
-    Callback = function(state)
-        spinEnabled = state
-        if spinEnabled then
-            if spinConn then spinConn:Disconnect() end
-            spinConn = RunService.RenderStepped:Connect(function()
-                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(6), 0)
-                end
-            end)
-        else
-            if spinConn then spinConn:Disconnect() spinConn = nil end
-        end
-    end,
-})
-
--- Глобальная переменная для скорости вращения (в градусах за кадр)
 local spinSpeed = 6
 
 -- Spin Toggle
