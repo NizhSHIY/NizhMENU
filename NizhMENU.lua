@@ -37,7 +37,6 @@ local Window = Rayfield:CreateWindow({
 
 local VisualsTab = Window:CreateTab("Visuals", 4483362458)
 local PlayerTab = Window:CreateTab("Player", 4483362458)
-local CombatTab = Window:CreateTab("Combat", 4483362458)
 local OtherTab = Window:CreateTab("Other", 4483362458)
 
 ---------------- VISUALS ----------------
@@ -405,16 +404,9 @@ PlayerTab:CreateParagraph({
     end
 })
 
----------------- COMBAT ----------------
-CombatTab:CreateParagraph({
-    Title = "Combat",
-    Content = "Здесь могут быть боевые функции"
-})
-
 ---------------- OTHER ----------------
 OtherTab:CreateParagraph({
-    Title = "Other",
-    Content = "Здесь можно добавить другие функции или информацию"
+    Title = "Other"
 })
 
 ---------------- МЕНЮ ----------------
