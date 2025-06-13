@@ -1,4 +1,3 @@
--- Загрузка Rayfield UI Library
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Players = game:GetService("Players")
@@ -26,7 +25,6 @@ local hideGuiEnabled = false
 local hiddenGuis = {}
 local teleportConn
 
--- Окно и вкладки
 local Window = Rayfield:CreateWindow({
     Name = "NizhMENU",
     LoadingTitle = "NizhMENU",
@@ -118,7 +116,7 @@ VisualsTab:CreateToggle({
     end,
 })
 
--- Hide GUI (скрывает всё кроме меню Rayfield)
+-- Hide GUI
 VisualsTab:CreateToggle({
     Name = "Hide GUI (кроме меню)",
     CurrentValue = false,
@@ -354,7 +352,7 @@ PlayerTab:CreateToggle({
     end,
 })
 
--- Spin Speed Slider
+-- Spin Speed
 PlayerTab:CreateSlider({
     Name = "Spin Speed",
     Range = {1, 10000},
@@ -388,7 +386,6 @@ PlayerTab:CreateToggle({
     end,
 })
 
--- Информация о персонаже
 PlayerTab:CreateParagraph({
     Title = "Инфо",
     Content = function()
@@ -409,9 +406,6 @@ OtherTab:CreateParagraph({
     Title = "Other"
 })
 
----------------- МЕНЮ ----------------
-
--- Скрытие/открытие Rayfield по F4
 local menuVisible = true
 UIS.InputBegan:Connect(function(input, gpe)
     if gpe then return end
